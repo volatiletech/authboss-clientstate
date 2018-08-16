@@ -57,7 +57,7 @@ func NewSessionStorerFromExisting(sessionName string, store sessions.Store) Sess
 func (s SessionStorer) ReadState(r *http.Request) (authboss.ClientState, error) {
 	session, err := s.Store.Get(r, s.Name)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	cs := &SessionState{
