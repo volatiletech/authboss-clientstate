@@ -61,6 +61,14 @@ func (c CookieStorer) ReadState(r *http.Request) (authboss.ClientState, error) {
 			if n == cookie.Name {
 				var str string
 				if err := c.SecureCookie.Decode(n, cookie.Value, &str); err != nil {
+					if e, ok := err.(securecookie.Error); ok {
+						// Ignore bad cookies, this means that the client
+						// may have bad cookies for a long time, but they should
+						// eventually be overwritten by the application.
+						if e.IsDecode() {
+							continue
+						}
+					}
 					return nil, err
 				}
 
