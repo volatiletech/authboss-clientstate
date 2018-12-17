@@ -22,6 +22,17 @@ var (
 type CookieStorer struct {
 	Cookies []string
 	*securecookie.SecureCookie
+
+	// Defaults empty
+	Domain string
+	// Defaults to /
+	Path string
+	// Defaults to 1 month
+	MaxAge int
+	// Defaults to true
+	HTTPOnly bool
+	// Defaults to true
+	Secure bool
 }
 
 // NewCookieStorer constructor simply wraps the constructor for
@@ -34,21 +45,30 @@ type CookieStorer struct {
 // AES-192, AES-256
 // respectively.
 //
+// Ensure you verify the security options for the cookie on the CookieStorer.
+//
 // This documentation was copied from securecookie.New and is prone to doc-rot. Please
 // consult the documentation there too.
 func NewCookieStorer(hashKey, blockKey []byte) CookieStorer {
-	return CookieStorer{
-		Cookies:      defaultCookieList,
-		SecureCookie: securecookie.New(hashKey, blockKey),
-	}
+	return NewCookieStorerFromExisting(securecookie.New(hashKey, blockKey))
 }
 
 // NewCookieStorerFromExisting takes a preconfigured
 // secure cookie instance and simply uses it.
+//
+// Ensure you verify the additional security options for the cookie on the
+// CookieStorer. This method creates a cookie storer with the options tuned
+// for high security by default.
 func NewCookieStorerFromExisting(storage *securecookie.SecureCookie) CookieStorer {
 	return CookieStorer{
 		Cookies:      defaultCookieList,
 		SecureCookie: storage,
+
+		Path: "/",
+		// 1 month
+		MaxAge:   int(time.Hour * 730),
+		HTTPOnly: true,
+		Secure:   true,
 	}
 }
 
@@ -94,14 +114,20 @@ func (c CookieStorer) WriteState(w http.ResponseWriter, state authboss.ClientSta
 				Expires: time.Now().UTC().AddDate(1, 0, 0),
 				Name:    ev.Key,
 				Value:   encoded,
-				Path:    "/",
+
+				Domain:   c.Domain,
+				Path:     c.Path,
+				MaxAge:   c.MaxAge,
+				HttpOnly: c.HTTPOnly,
+				Secure:   c.Secure,
 			}
 			http.SetCookie(w, cookie)
 		case authboss.ClientStateEventDel:
 			cookie := &http.Cookie{
 				MaxAge: -1,
 				Name:   ev.Key,
-				Path:   "/",
+				Domain: c.Domain,
+				Path:   c.Path,
 			}
 			http.SetCookie(w, cookie)
 		}

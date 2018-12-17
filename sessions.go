@@ -32,12 +32,23 @@ type SessionStorer struct {
 // Encryption keys should be 16, 24, or 32 bytes for AES-128, AES-192, and AES-256
 // respectively.
 //
+// This creates the session storer with the most secure options: MaxAge=0,
+// Secure=true, HttpOnly=true. You can change them after it's created by
+// converting the Store or simply create your own sessions.NewCookieStore
+// and set its options manually.
+//
 // These docs are prone to doc-rot since they're copied from the gorilla
 // session store documentation.
 func NewSessionStorer(sessionName string, keypairs ...[]byte) SessionStorer {
+	cookieStore := sessions.NewCookieStore(keypairs...)
+
+	cookieStore.Options.MaxAge = 0
+	cookieStore.Options.HttpOnly = true
+	cookieStore.Options.Secure = true
+
 	return SessionStorer{
 		Name:  sessionName,
-		Store: sessions.NewCookieStore(keypairs...),
+		Store: cookieStore,
 	}
 }
 
