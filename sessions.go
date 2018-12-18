@@ -2,6 +2,7 @@ package abclientstate
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/securecookie"
@@ -108,6 +109,30 @@ func (s SessionStorer) WriteState(w http.ResponseWriter, state authboss.ClientSt
 			ses.session.Values[ev.Key] = ev.Value
 		case authboss.ClientStateEventDel:
 			delete(ses.session.Values, ev.Key)
+
+		case authboss.ClientStateEventDelAll:
+			if len(ev.Key) == 0 {
+				// Delete the entire session
+				ses.session.Options.MaxAge = -1
+			} else {
+				whitelist := strings.Split(ev.Key, ",")
+				for key := range ses.session.Values {
+					if k, ok := key.(string); ok {
+
+						dontDelete := false
+						for _, w := range whitelist {
+							if w == k {
+								dontDelete = true
+								break
+							}
+						}
+
+						if !dontDelete {
+							delete(ses.session.Values, key)
+						}
+					}
+				}
+			}
 		}
 	}
 
