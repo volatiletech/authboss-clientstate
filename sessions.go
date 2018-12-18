@@ -2,6 +2,7 @@ package abclientstate
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
@@ -42,7 +43,9 @@ type SessionStorer struct {
 func NewSessionStorer(sessionName string, keypairs ...[]byte) SessionStorer {
 	cookieStore := sessions.NewCookieStore(keypairs...)
 
-	cookieStore.Options.MaxAge = 0
+	// 12 hours, set this to something because if we don't then sessions
+	// may never expire as long as the browser remains opened.
+	cookieStore.Options.MaxAge = int(time.Hour * 12)
 	cookieStore.Options.HttpOnly = true
 	cookieStore.Options.Secure = true
 
