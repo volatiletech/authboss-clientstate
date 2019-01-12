@@ -67,8 +67,8 @@ func NewCookieStorerFromExisting(storage *securecookie.SecureCookie) CookieStore
 		SecureCookie: storage,
 
 		Path: "/",
-		// 1 month
-		MaxAge:   int(time.Hour * 730),
+		// 1 month in seconds
+		MaxAge:   int((time.Hour * 730) / time.Second),
 		HTTPOnly: true,
 		Secure:   true,
 	}
