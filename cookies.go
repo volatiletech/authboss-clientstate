@@ -33,6 +33,8 @@ type CookieStorer struct {
 	HTTPOnly bool
 	// Defaults to true
 	Secure bool
+	// Samesite defaults to 0 or "off"
+	SameSite http.SameSite
 }
 
 // NewCookieStorer constructor simply wraps the constructor for
@@ -120,6 +122,7 @@ func (c CookieStorer) WriteState(w http.ResponseWriter, state authboss.ClientSta
 				MaxAge:   c.MaxAge,
 				HttpOnly: c.HTTPOnly,
 				Secure:   c.Secure,
+				SameSite: c.SameSite,
 			}
 			http.SetCookie(w, cookie)
 		case authboss.ClientStateEventDel:
