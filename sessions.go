@@ -46,7 +46,7 @@ func NewSessionStorer(sessionName string, keypairs ...[]byte) SessionStorer {
 
 	// 12 hours, set this to something because if we don't then sessions
 	// may never expire as long as the browser remains opened.
-	cookieStore.MaxAge(int(time.Hour * 12 / time.Second))
+	cookieStore.MaxAge(int((time.Hour * 12) / time.Second))
 	cookieStore.Options.HttpOnly = true
 	cookieStore.Options.Secure = true
 
