@@ -1,6 +1,7 @@
 package abclientstate
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -80,12 +81,12 @@ func (s SessionStorer) ReadState(r *http.Request) (authboss.ClientState, error) 
 			return nil, err
 		}
 
-		// Get returning a new session even when there's an error is a bit
-		// more up in the air, so we force the new session here if we've
-		// previously encountered an error.
+		// Get in gorilla does not return new sessions if a bad one exists
+		// New() also happens to parse the cookie in r, and returns the same
+		// decode error but still returns a new session
 		session, err = s.Store.New(r, s.Name)
-		if err != nil {
-			return nil, err
+		if session == nil {
+			return nil, errors.New("could not create new session")
 		}
 	}
 
