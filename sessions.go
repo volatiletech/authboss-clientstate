@@ -57,19 +57,6 @@ func NewSessionStorer(sessionName string, keypairs ...[]byte) SessionStorer {
 	}
 }
 
-// NewSessionStorerFromExisting takes a store object that's already
-// configured and uses it directly. This can be anything that satisfies
-// the interface.
-//
-// sessionName is the name of the cookie/file/whatever on the client or on
-// the filesystem etc.
-func NewSessionStorerFromExisting(sessionName string, store sessions.Store) SessionStorer {
-	return SessionStorer{
-		Name:  sessionName,
-		Store: store,
-	}
-}
-
 // ReadState loads the session from the request context
 func (s SessionStorer) ReadState(r *http.Request) (authboss.ClientState, error) {
 	// Note that implementers of Get in gorilla all return a new session

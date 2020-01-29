@@ -9,10 +9,6 @@ import (
 	"github.com/volatiletech/authboss"
 )
 
-var (
-	defaultCookieList = []string{authboss.CookieRemember}
-)
-
 // CookieStorer writes and reads cookies to an underlying
 // gorilla secure cookie storage.
 //
@@ -35,43 +31,6 @@ type CookieStorer struct {
 	Secure bool
 	// Samesite defaults to 0 or "off"
 	SameSite http.SameSite
-}
-
-// NewCookieStorer constructor simply wraps the constructor for
-// securecookie.New. The parameters are the hash key and the block key.
-//
-// The hash key is required to authenticate the cookie with HMAC (32 or 64 bytes)
-//
-// The block key is optional to encrypt the cookie value (set to nil to disable encryption)
-// For AES (the default encryption algorithm) 16, 24, or 32 byte keys select AES-128,
-// AES-192, AES-256
-// respectively.
-//
-// Ensure you verify the security options for the cookie on the CookieStorer.
-//
-// This documentation was copied from securecookie.New and is prone to doc-rot. Please
-// consult the documentation there too.
-func NewCookieStorer(hashKey, blockKey []byte) CookieStorer {
-	return NewCookieStorerFromExisting(securecookie.New(hashKey, blockKey))
-}
-
-// NewCookieStorerFromExisting takes a preconfigured
-// secure cookie instance and simply uses it.
-//
-// Ensure you verify the additional security options for the cookie on the
-// CookieStorer. This method creates a cookie storer with the options tuned
-// for high security by default.
-func NewCookieStorerFromExisting(storage *securecookie.SecureCookie) CookieStorer {
-	return CookieStorer{
-		Cookies:      defaultCookieList,
-		SecureCookie: storage,
-
-		Path: "/",
-		// 1 month in seconds
-		MaxAge:   int((time.Hour * 730) / time.Second),
-		HTTPOnly: true,
-		Secure:   true,
-	}
 }
 
 // ReadState from the request
@@ -103,7 +62,7 @@ func (c CookieStorer) ReadState(r *http.Request) (authboss.ClientState, error) {
 }
 
 // WriteState to the responsewriter
-func (c CookieStorer) WriteState(w http.ResponseWriter, state authboss.ClientState, ev []authboss.ClientStateEvent) error {
+func (c CookieStorer) WriteState(w http.ResponseWriter, _ authboss.ClientState, ev []authboss.ClientStateEvent) error {
 	for _, ev := range ev {
 		switch ev.Kind {
 		case authboss.ClientStateEventPut:
