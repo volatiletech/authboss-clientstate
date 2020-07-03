@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/friendsofgo/errors"
 	"github.com/gorilla/securecookie"
-	"github.com/pkg/errors"
 	"github.com/volatiletech/authboss/v3"
 )
 
