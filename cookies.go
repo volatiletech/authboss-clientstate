@@ -6,7 +6,7 @@ import (
 
 	"github.com/gorilla/securecookie"
 	"github.com/pkg/errors"
-	"github.com/volatiletech/authboss"
+	"github.com/volatiletech/authboss/v3"
 )
 
 var (
