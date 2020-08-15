@@ -1,4 +1,4 @@
-package main
+package abclientstate
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/volatiletech/authboss"
+	"github.com/volatiletech/authboss/v3"
 )
 
 func TestGetCookieState(t *testing.T) {
